@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop Gear | MotoHub</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body data-page="products">
+  <div id="site-header"></div>
+  <main class="container page-main">
+    <div class="page-intro"><span class="eyebrow">THE MOTOHUB STORE</span>
+      <h1>Find your <em>gear.</em></h1>
+      <p>Reliable essentials for wherever the road takes you.</p>
+    </div>
+    <div class="shop-toolbar">
+      <div id="results-count">All products</div>
+      <div class="toolbar-controls"><input id="search-input" class="search-input" type="search"
+          placeholder="Search gear..." aria-label="Search products"><select id="sort-select" aria-label="Sort products">
+          <option value="featured">Featured</option>
+          <option value="price-low">Price: low to high</option>
+          <option value="price-high">Price: high to low</option>
+          <option value="rating">Top rated</option>
+        </select></div>
+    </div>
+    <div class="shop-layout">
+      <aside class="filters">
+        <h3>Categories</h3>
+        <div id="category-filters" class="filter-list"></div>
+        <hr>
+        <h3>Maximum price</h3><label class="range-label">Up to <strong id="price-value">₹15,000</strong></label><input
+          id="price-filter" type="range" min="500" max="15000" step="500" value="15000">
+        <hr><button id="clear-filters" class="text-link" type="button">Clear all filters ×</button>
+      </aside>
+      <section>
+        <div id="shop-products" class="product-grid"></div>
+        <p id="empty-state" class="empty-state hidden">No gear found. Try changing your filters.</p>
+      </section>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="../js/products.js"></script>
+  <script src="../js/app.js"></script>
+</body>
+
+</html>
