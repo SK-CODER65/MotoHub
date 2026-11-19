@@ -16,6 +16,11 @@ A responsive, multi-page e-commerce frontend made with **HTML5, CSS3 and vanilla
 - `pages/checkout.html` — validated delivery form and demo order confirmation
 - `pages/login.html` / `pages/register.html` — demo account flow
 - `pages/orders.html` — order history
+- `pages/deals.html` — deal of the week and discount filters
+- `pages/journal.html` / `pages/article.html` — ride journal (blog) with category filters and article view
+- `pages/about.html` — brand story, stats and values
+- `pages/faq.html` — searchable FAQ accordion
+- `pages/contact.html` — validated demo contact form and store info
 
 ## Folder structure
 ```text

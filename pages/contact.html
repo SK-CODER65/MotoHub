@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | MotoHub</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body data-page="contact">
+    <div id="site-header"></div>
+    <main class="container page-main">
+        <div class="page-intro"><span class="eyebrow">GET IN TOUCH</span>
+            <h1>Let's talk <em>gear.</em></h1>
+            <p>Questions about sizing, orders or the right kit for your next ride? Send us a message.</p>
+        </div>
+        <div class="contact-layout">
+            <form id="contact-form" class="form-card">
+                <h2>Send a message</h2>
+                <p class="muted">This is a demo form — messages are saved in this browser only.</p>
+                <div class="checkout-form">
+                    <label>Full name<input name="name" required minlength="2" placeholder="Your full name"></label>
+                    <label>Email<input name="email" type="email" required placeholder="you@example.com"></label>
+                    <label class="full-field">Topic<select name="topic">
+                            <option>Product question</option>
+                            <option>Order &amp; delivery</option>
+                            <option>Returns</option>
+                            <option>Something else</option>
+                        </select></label>
+                    <label class="full-field">Message<textarea name="message" required minlength="10" placeholder="How can we help?"></textarea></label>
+                    <button class="btn btn-dark" type="submit">Send message →</button>
+                </div>
+                <p id="contact-message" class="form-message success" aria-live="polite"></p>
+            </form>
+            <aside class="contact-info">
+                <div class="info-card"><span class="info-icon">✉</span>
+                    <div><strong>Email</strong><span>support@motohub.example</span></div>
+                </div>
+                <div class="info-card"><span class="info-icon">☏</span>
+                    <div><strong>Phone</strong><span>+91 00000 00000 (demo)</span></div>
+                </div>
+                <div class="info-card"><span class="info-icon">⌂</span>
+                    <div><strong>Studio</strong><span>MotoHub HQ, Bengaluru, India</span></div>
+                </div>
+                <div class="info-card"><span class="info-icon">◷</span>
+                    <div><strong>Hours</strong><span>Mon–Sat, 10:00 – 19:00 IST</span></div>
+                </div>
+                <a class="text-link" href="faq.html">Looking for quick answers? Visit the FAQ →</a>
+            </aside>
+        </div>
+    </main>
+    <div id="site-footer"></div>
+    <script src="../js/products.js"></script>
+    <script src="../js/app.js"></script>
+</body>
+
+</html>

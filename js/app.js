@@ -37,20 +37,26 @@ function updateCounts() {
   if (wishCount) wishCount.textContent = w;
 }
 
+const NAV_LINKS = [
+  ["Home", "index.html", ["home"]],
+  ["Shop", "pages/products.html", ["products", "details"]],
+  ["Deals", "pages/deals.html", ["deals"]],
+  ["Journal", "pages/journal.html", ["journal", "article"]],
+  ["About", "pages/about.html", ["about"]],
+  ["FAQ", "pages/faq.html", ["faq"]],
+  ["Contact", "pages/contact.html", ["contact"]],
+  ["Orders", "pages/orders.html", ["orders"]]
+];
+
 function header() {
-  const links = page === "home" ? ["Shop", "Orders"] : ["Home", "Shop", "Orders"];
-  const hrefs = {
-    "Home": base + "index.html",
-    "Shop": base + "pages/products.html",
-    "Orders": base + "pages/orders.html"
-  };
-  $("#site-header").innerHTML = `<header class="site-header"><div class="nav-wrap"><a class="logo" href="${base}index.html">MOTO<span>HUB.</span></a><nav id="nav-links" class="nav-links">${links.map(x => `<a href="${hrefs[x]}">${x}</a>`).join("")}</nav><div class="nav-actions"><a class="nav-icon" href="${base}pages/wishlist.html" aria-label="Wishlist">♡<span id="wish-count" class="count">0</span></a><a class="nav-icon" href="${base}pages/cart.html" aria-label="Cart">⌑<span id="cart-count" class="count">0</span></a><a class="nav-icon account-link" href="${base}pages/login.html" aria-label="Account">♙</a></div><button class="menu-toggle" id="menu-toggle" aria-label="Open navigation">☰</button></div></header>`;
+  const links = NAV_LINKS.map(([label, href, pages]) => `<a href="${base + href}"${pages.includes(page) ? ' class="active" aria-current="page"' : ""}>${label}</a>`).join("");
+  $("#site-header").innerHTML = `<header class="site-header"><div class="nav-wrap"><a class="logo" href="${base}index.html">MOTO<span>HUB.</span></a><nav id="nav-links" class="nav-links">${links}</nav><div class="nav-actions"><a class="nav-icon" href="${base}pages/wishlist.html" aria-label="Wishlist">♡<span id="wish-count" class="count">0</span></a><a class="nav-icon" href="${base}pages/cart.html" aria-label="Cart">⌑<span id="cart-count" class="count">0</span></a><a class="nav-icon account-link" href="${base}pages/login.html" aria-label="Account">♙</a></div><button class="menu-toggle" id="menu-toggle" aria-label="Open navigation">☰</button></div></header>`;
   $("#menu-toggle").addEventListener("click", () => $("#nav-links").classList.toggle("open"));
   updateCounts();
 }
 
 function footer() {
-  $("#site-footer").innerHTML = `<footer class="site-footer"><div class="footer-inner"><div class="footer-brand"><a class="logo" href="${base}index.html">MOTO<span>HUB.</span></a><p>Thoughtfully selected riding gear and accessories for the road ahead. Gear up and make every ride count.</p></div><div class="footer-links"><div><strong>EXPLORE</strong><a href="${base}pages/products.html">All products</a><a href="${base}pages/products.html?category=Helmets">Helmets</a><a href="${base}pages/products.html?category=Jackets">Jackets</a></div><div><strong>YOUR ACCOUNT</strong><a href="${base}pages/login.html">Sign in</a><a href="${base}pages/wishlist.html">Wishlist</a><a href="${base}pages/orders.html">Orders</a></div><div><strong>HELP</strong><a href="${base}pages/cart.html">Shopping cart</a><a href="${base}pages/checkout.html">Checkout</a><a href="${base}index.html#about">About MotoHub</a></div></div></div><div class="footer-bottom"><span>© 2026 MotoHub.</span><span>Made for the love of the ride.</span></div></footer>`;
+  $("#site-footer").innerHTML = `<footer class="site-footer"><div class="footer-inner"><div class="footer-brand"><a class="logo" href="${base}index.html">MOTO<span>HUB.</span></a><p>Thoughtfully selected riding gear and accessories for the road ahead. Gear up and make every ride count.</p></div><div class="footer-links"><div><strong>EXPLORE</strong><a href="${base}pages/products.html">All products</a><a href="${base}pages/deals.html">Deals</a><a href="${base}pages/journal.html">Ride journal</a><a href="${base}pages/products.html?category=Helmets">Helmets</a></div><div><strong>YOUR ACCOUNT</strong><a href="${base}pages/login.html">Sign in</a><a href="${base}pages/wishlist.html">Wishlist</a><a href="${base}pages/orders.html">Orders</a></div><div><strong>HELP</strong><a href="${base}pages/faq.html">FAQ</a><a href="${base}pages/contact.html">Contact us</a><a href="${base}pages/about.html">About MotoHub</a><a href="${base}pages/cart.html">Shopping cart</a></div></div></div><div class="footer-bottom"><span>© 2026 MotoHub.</span><span>Made for the love of the ride.</span></div></footer>`;
 }
 
 function card(p) {
@@ -290,6 +296,105 @@ function auth() {
   });
 }
 
+const discount = p => Math.round((1 - p.price / p.oldPrice) * 100);
+
+function dealsPage() {
+  const filters = $("#deal-filters");
+  const minimums = [0, 15, 20];
+  let min = 0;
+  filters.innerHTML = minimums.map(m => `<button type="button" class="chip ${m === min ? "selected" : ""}" data-min="${m}">${m ? m + "%+ off" : "All deals"}</button>`).join("");
+  function render() {
+    const list = PRODUCTS.filter(p => discount(p) >= min).sort((a, b) => discount(b) - discount(a));
+    $("#deals-count").textContent = `${list.length} deal${list.length === 1 ? "" : "s"} live`;
+    $("#deal-products").innerHTML = list.map(p => card({ ...p, tag: `−${discount(p)}% off` })).join("");
+  }
+  filters.addEventListener("click", e => {
+    const b = e.target.closest("[data-min]");
+    if (!b) return;
+    min = Number(b.dataset.min);
+    [...filters.children].forEach(x => x.classList.toggle("selected", x === b));
+    render();
+  });
+  const best = [...PRODUCTS].sort((a, b) => discount(b) - discount(a))[0];
+  $("#deal-highlight").innerHTML = `<div><span class="eyebrow">DEAL OF THE WEEK</span><h2>${best.name}</h2><p>${best.description}</p><div class="detail-price">${money(best.price)} <span class="old-price">${money(best.oldPrice)}</span></div><div class="detail-actions"><button class="btn btn-light" data-add="${best.id}">Add to cart →</button><a class="btn btn-ghost" href="product-details.html?id=${best.id}">View details</a></div></div><div class="deal-visual"><img src="${best.image}" alt="${best.name}"><span class="deal-burst">−${discount(best)}%</span></div>`;
+  render();
+}
+
+const ARTICLES = [
+  { id: 1, title: "How to choose your first full-face helmet", category: "Gear guide", date: "12 Nov 2026", read: "6 min", image: PRODUCTS[0].image, excerpt: "Fit, shell shape, visor and certification — the essentials to check before you buy your first lid.", body: ["A helmet is the single most important piece of riding gear you will own. Start with fit: it should feel snug all around your head without pressure points, and the cheek pads should touch your face without pushing your lips together.", "Next, look at the shell shape. Round, intermediate and long-oval head shapes each suit different helmet designs, so try several brands if you can.", "Always check the safety certification printed on the helmet and make sure it is valid where you ride. A good visor with an anti-fog insert makes a huge difference on cold mornings and in the rain."] },
+  { id: 2, title: "Monsoon riding: 7 habits that keep you safe", category: "Riding tips", date: "28 Oct 2026", read: "5 min", image: PRODUCTS[5].image, excerpt: "Wet roads change everything. These simple habits help you stay visible, dry and in control.", body: ["Increase your following distance and brake earlier — wet surfaces can need much more distance to stop.", "Avoid painted road markings, metal covers and oil patches, which become slippery in the rain.", "Wear waterproof gloves and a bright or reflective layer so others can see you clearly. Keep inputs smooth: gentle throttle, gentle braking and gentle steering."] },
+  { id: 3, title: "Packing list for a weekend motorcycle tour", category: "Touring", date: "15 Oct 2026", read: "7 min", image: PRODUCTS[6].image, excerpt: "From tail bags to tyre repair kits — a lightweight checklist for two days on the open road.", body: ["Pack light and keep weight low and central. A tail bag and a small backpack are usually enough for a weekend.", "Bring a basic toolkit, a puncture repair kit, a phone charger and a rain layer even if the forecast looks good.", "Share your route with someone, plan fuel stops ahead and keep important documents in a waterproof pouch."] },
+  { id: 4, title: "Mesh vs textile jackets: which one suits you?", category: "Gear guide", date: "02 Oct 2026", read: "4 min", image: PRODUCTS[3].image, excerpt: "Hot city commutes or mixed-weather touring? Here is how to pick the right riding jacket.", body: ["Mesh jackets let air flow through and are ideal for hot weather and slow city traffic.", "Textile jackets offer more weather protection and are often better for touring, especially with a removable thermal or waterproof liner.", "Whichever you choose, look for armour at the shoulders and elbows, and consider a back protector."] },
+  { id: 5, title: "A 10-minute pre-ride check routine", category: "Maintenance", date: "20 Sep 2026", read: "3 min", image: PRODUCTS[8].image, excerpt: "Tyres, chain, lights, brakes — a quick routine to make every ride start right.", body: ["Check tyre pressure and tread when the tyres are cold.", "Look at chain tension and lubrication, then test front and rear brakes before moving off.", "Confirm that headlights, indicators and brake lights work, and check your mirrors are adjusted."] },
+  { id: 6, title: "Riding gloves 101: grip, protection and comfort", category: "Gear guide", date: "08 Sep 2026", read: "4 min", image: PRODUCTS[4].image, excerpt: "Your hands are your connection to the bike. Here is what to look for in a pair of riding gloves.", body: ["A good riding glove balances protection with feel. Look for reinforced palms and knuckle protection.", "Wrist closures help keep the glove on in a fall, and pre-curved fingers reduce fatigue on long rides.", "Keep a summer pair and a waterproof pair if you ride year-round."] }
+];
+
+function postCard(a) {
+  return `<article class="post-card"><a class="post-image" href="article.html?id=${a.id}"><img src="${a.image}" alt="${a.title}" loading="lazy" onerror="this.src='https://placehold.co/600x400/e9ede7/53604e?text=MotoHub+Journal'"><span class="product-tag">${a.category}</span></a><div class="post-body"><span class="post-meta">${a.date} · ${a.read} read</span><a class="post-title" href="article.html?id=${a.id}">${a.title}</a><p>${a.excerpt}</p><a class="text-link" href="article.html?id=${a.id}">Read article →</a></div></article>`;
+}
+
+function journalPage() {
+  const filters = $("#journal-filters");
+  const cats = ["All", ...new Set(ARTICLES.map(a => a.category))];
+  let active = "All";
+  filters.innerHTML = cats.map(c => `<button type="button" class="chip ${c === active ? "selected" : ""}" data-cat="${c}">${c}</button>`).join("");
+  const render = () => $("#journal-posts").innerHTML = ARTICLES.filter(a => active === "All" || a.category === active).map(postCard).join("");
+  filters.addEventListener("click", e => {
+    const b = e.target.closest("[data-cat]");
+    if (!b) return;
+    active = b.dataset.cat;
+    [...filters.children].forEach(x => x.classList.toggle("selected", x === b));
+    render();
+  });
+  render();
+}
+
+function articlePage() {
+  const a = ARTICLES.find(x => x.id === Number(new URLSearchParams(location.search).get("id")));
+  if (!a) {
+    $("#article").innerHTML = '<div class="empty-panel"><h2>Article not found</h2><a class="btn btn-dark" href="journal.html">Back to journal</a></div>';
+    return;
+  }
+  document.title = a.title + " | MotoHub Journal";
+  $("#article").innerHTML = `<div class="breadcrumb"><a href="journal.html">Journal</a> / ${a.category}</div><span class="eyebrow">${a.category.toUpperCase()} · ${a.read.toUpperCase()} READ</span><h1>${a.title}</h1><p class="post-meta">Published ${a.date} by the MotoHub team</p><img class="article-cover" src="${a.image}" alt="${a.title}" onerror="this.src='https://placehold.co/900x500/e9ede7/53604e?text=MotoHub+Journal'"><div class="article-body">${a.body.map(t => `<p>${t}</p>`).join("")}<p class="summary-note">These tips are general guidance only. Always follow local laws and your manufacturer's recommendations.</p></div>`;
+  $("#related-posts").innerHTML = ARTICLES.filter(x => x.id !== a.id).slice(0, 3).map(postCard).join("");
+}
+
+function faqPage() {
+  const search = $("#faq-search");
+  const groups = [...document.querySelectorAll(".faq-group")];
+  search.addEventListener("input", () => {
+    const q = search.value.trim().toLowerCase();
+    let shown = 0;
+    groups.forEach(g => {
+      let visible = 0;
+      g.querySelectorAll("details").forEach(d => {
+        const match = d.textContent.toLowerCase().includes(q);
+        d.classList.toggle("hidden", !match);
+        if (match) visible++;
+      });
+      g.classList.toggle("hidden", !visible);
+      shown += visible;
+    });
+    $("#faq-empty").classList.toggle("hidden", shown > 0);
+  });
+}
+
+function contactPage() {
+  const form = $("#contact-form");
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(form));
+    const messages = getStore("motohub_messages");
+    const ticket = "MHT" + Date.now().toString().slice(-6);
+    messages.unshift({ ticket, date: new Date().toLocaleString("en-IN"), ...data });
+    setStore("motohub_messages", messages);
+    form.reset();
+    $("#contact-message").textContent = `Thanks ${data.name.split(" ")[0]}! Your demo ticket ${ticket} has been saved in this browser.`;
+    toast("Message sent");
+  });
+}
+
 header();
 footer();
 ({
@@ -301,5 +406,10 @@ footer();
   checkout,
   orders: ordersPage,
   login: auth,
-  register: auth
+  register: auth,
+  deals: dealsPage,
+  journal: journalPage,
+  article: articlePage,
+  faq: faqPage,
+  contact: contactPage
 }[page] || (() => {}))();
